@@ -1,0 +1,59 @@
+<div class="row justify-content-center align-items-center min-vh-100"
+  style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+  <div class="col-md-5 col-lg-4">
+    <div class="card border-0 shadow-lg p-4 glass animate-fade-in">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold text-gradient mb-1">{{ mode === 'login' ? 'Welcome Back' : 'Create Account' }}</h3>
+        <p class="text-muted small">Enter your details to access the OMS</p>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger py-2 d-flex align-items-center gap-2">
+        <span class="material-icons-round fs-5">error_outline</span>
+        {{error}}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="mb-3">
+          <label class="form-label fw-medium text-dark small">Username</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-muted"><span
+                class="material-icons-round fs-5">person</span></span>
+            <input class="form-control border-start-0 ps-0" placeholder="johndoe" formControlName="username" />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-medium text-dark small">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-muted"><span
+                class="material-icons-round fs-5">lock</span></span>
+            <input type="password" class="form-control border-start-0 ps-0" placeholder="••••••••"
+              formControlName="password" />
+          </div>
+        </div>
+
+        <div class="mb-3 animate-fade-in" *ngIf="mode === 'register'">
+          <label class="form-label fw-medium text-dark small">Confirm password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-muted"><span
+                class="material-icons-round fs-5">lock_reset</span></span>
+            <input type="password" class="form-control border-start-0 ps-0" placeholder="••••••••"
+              formControlName="confirmPassword" />
+          </div>
+        </div>
+
+        <button class="btn btn-primary w-100 mt-2 shadow-sm" [disabled]="loading || form.invalid">
+          {{ loading ? (mode === 'login' ? 'Signing in...' : 'Creating...') : (mode === 'login' ? 'Sign in' : 'Create
+          account') }}
+        </button>
+      </form>
+
+      <div class="text-center mt-4">
+        <button type="button" class="btn btn-link text-decoration-none text-muted small hover-lift"
+          (click)="mode = mode === 'login' ? 'register' : 'login'; error=null">
+          {{ mode === 'login' ? 'New user? Create account' : 'Already have an account? Login' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

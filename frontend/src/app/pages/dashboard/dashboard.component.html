@@ -1,0 +1,106 @@
+<div class="d-flex align-items-center justify-content-between mb-4 animate-fade-in">
+  <div>
+    <h3 class="fw-bold mb-1">Dashboard</h3>
+    <div class="text-muted small">Overview of your store's performance</div>
+  </div>
+  <button class="btn btn-white border shadow-sm d-flex align-items-center gap-2 hover-lift" (click)="refresh()">
+    <span class="material-icons-round fs-6">refresh</span>
+    <span>Refresh</span>
+  </button>
+</div>
+
+<div *ngIf="error" class="alert alert-danger py-2 d-flex align-items-center gap-2">
+  <span class="material-icons-round fs-5">error</span>
+  {{error}}
+</div>
+<div *ngIf="loading" class="text-center py-5 text-muted">
+  <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+  <div>Loading data...</div>
+</div>
+
+<div *ngIf="!loading && stats" class="row g-4 animate-fade-in">
+  <div class="col-md-3">
+    <div class="card p-4 h-100 border-0 shadow-sm hover-lift">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
+          <span class="material-icons-round">shopping_cart</span>
+        </div>
+        <div class="text-muted fw-medium">Active Orders</div>
+      </div>
+      <div class="display-5 fw-bold text-dark">{{stats.activeOrders}}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-4 h-100 border-0 shadow-sm hover-lift">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="bg-success bg-opacity-10 p-2 rounded-3 text-success">
+          <span class="material-icons-round">receipt_long</span>
+        </div>
+        <div class="text-muted fw-medium">Total Orders</div>
+      </div>
+      <div class="display-5 fw-bold text-dark">{{stats.totalOrders}}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-4 h-100 border-0 shadow-sm hover-lift">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="bg-warning bg-opacity-10 p-2 rounded-3 text-warning">
+          <span class="material-icons-round">inventory_2</span>
+        </div>
+        <div class="text-muted fw-medium">Total Products</div>
+      </div>
+      <div class="display-5 fw-bold text-dark">{{stats.totalProducts}}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-4 h-100 border-0 shadow-sm hover-lift cursor-pointer" routerLink="/products"
+      [queryParams]="{lowStock: true}">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="bg-danger bg-opacity-10 p-2 rounded-3 text-danger">
+          <span class="material-icons-round">warning</span>
+        </div>
+        <div class="text-muted fw-medium">Low Stock</div>
+      </div>
+      <div class="display-5 fw-bold text-danger">{{lowStockCount}}</div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card p-4 border-0 shadow-sm">
+      <div class="d-flex align-items-center gap-2 mb-4">
+        <span class="material-icons-round text-secondary">pie_chart</span>
+        <h5 class="fw-bold mb-0">Order Status Breakdown</h5>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 bg-light border">
+            <div class="text-muted small mb-1">Placed</div>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="h3 fw-bold mb-0">{{stats.placed}}</div>
+              <span class="badge bg-secondary bg-opacity-10 text-secondary">New</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 bg-light border">
+            <div class="text-muted small mb-1">Shipped</div>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="h3 fw-bold mb-0">{{stats.shipped}}</div>
+              <span class="badge bg-primary bg-opacity-10 text-primary">In Transit</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 bg-light border">
+            <div class="text-muted small mb-1">Delivered</div>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="h3 fw-bold mb-0">{{stats.delivered}}</div>
+              <span class="badge bg-success bg-opacity-10 text-success">Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

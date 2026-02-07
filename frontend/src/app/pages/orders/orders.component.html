@@ -1,0 +1,312 @@
+<div class="d-flex align-items-center justify-content-between mb-4 animate-fade-in">
+  <div>
+    <h3 class="fw-bold mb-1">Orders</h3>
+    <div class="text-muted small">Place, search, and manage orders</div>
+  </div>
+  <button class="btn btn-white border shadow-sm d-flex align-items-center gap-2 hover-lift" (click)="refreshOrders()">
+    <span class="material-icons-round fs-6">refresh</span>
+    <span>Refresh</span>
+  </button>
+</div>
+
+<div *ngIf="error" class="alert alert-danger py-2 d-flex align-items-center gap-2">
+  <span class="material-icons-round fs-5">error</span>
+  {{error}}
+</div>
+
+<!-- Filters -->
+<div class="card border-0 shadow-sm p-4 glass mb-4 animate-fade-in">
+  <form [formGroup]="filtersForm" (ngSubmit)="refreshOrders()">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label fw-medium small text-muted">Search Orders</label>
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0"><span
+              class="material-icons-round fs-6">search</span></span>
+          <input class="form-control border-start-0" formControlName="q" placeholder="Order ID, Product, or SKU">
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label fw-medium small text-muted">Status</label>
+        <select class="form-select" formControlName="status">
+          <option value="">All Statuses</option>
+          <option value="PLACED">Placed</option>
+          <option value="SHIPPED">Shipped</option>
+          <option value="DELIVERED">Delivered</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+
+      <div class="col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary w-100 shadow-sm">Search</button>
+        <button type="button" class="btn btn-light border w-100" (click)="clearFilters()">Clear</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Place order (USER only) -->
+<div *ngIf="!ordersApi.isAdmin()" class="card border-0 shadow-sm p-4 mb-4 animate-fade-in">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <div class="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
+      <span class="material-icons-round fs-5">add_shopping_cart</span>
+    </div>
+    <h5 class="fw-bold mb-0">Place New Order</h5>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="place()">
+    <div formArrayName="items" class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <label class="fw-medium small text-muted">Order Items</label>
+        <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+          (click)="addItem('place')">
+          <span class="material-icons-round fs-6">add</span> Add Item
+        </button>
+      </div>
+
+      <div class="row g-2 mb-2 align-items-center" *ngFor="let grp of items.controls; let i = index"
+        [formGroupName]="i">
+        <div class="col-md-8">
+          <select class="form-select" formControlName="productId">
+            <option [ngValue]="null">Select product...</option>
+            <option *ngFor="let p of products" [ngValue]="p.productId">
+              {{ p.name }} ({{ p.sku }}) — ₹{{ p.unitPrice }} — Stock: {{ p.stockQty }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <input type="number" class="form-control" formControlName="qty" placeholder="Qty" />
+        </div>
+
+        <div class="col-md-2">
+          <button type="button" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center"
+            (click)="removeItem(i, 'place')" [disabled]="items.length === 1">
+            <span class="material-icons-round fs-6">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div formGroupName="address" class="p-3 bg-light rounded-3 mb-3">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <span class="material-icons-round fs-6 text-muted">local_shipping</span>
+        <span class="fw-semibold">Shipping Address</span>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <input class="form-control" formControlName="fullName" placeholder="Full Name" />
+        </div>
+        <div class="col-md-6">
+          <input class="form-control" formControlName="phone" placeholder="Phone Number" />
+        </div>
+        <div class="col-12">
+          <input class="form-control" formControlName="line1" placeholder="Address Line 1" />
+        </div>
+        <div class="col-12">
+          <input class="form-control" formControlName="line2" placeholder="Address Line 2 (Optional)" />
+        </div>
+        <div class="col-md-3">
+          <input class="form-control" formControlName="city" placeholder="City" />
+        </div>
+        <div class="col-md-3">
+          <input class="form-control" formControlName="state" placeholder="State" />
+        </div>
+        <div class="col-md-3">
+          <input class="form-control" formControlName="pincode" placeholder="Pincode" />
+        </div>
+        <div class="col-md-3">
+          <input class="form-control" formControlName="country" placeholder="Country" />
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary w-100 shadow-sm py-2" [disabled]="placing || form.invalid">
+      {{ placing ? 'Placing Order...' : 'Place Order' }}
+    </button>
+  </form>
+</div>
+
+<!-- Edit order (USER only) -->
+<div *ngIf="editing" class="card border-0 shadow-lg p-4 mb-4 border-start border-primary border-4 animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center gap-2">
+      <span class="material-icons-round text-primary">edit</span>
+      <h5 class="fw-bold mb-0">Edit Order #{{ editing.orderId }}</h5>
+    </div>
+    <button class="btn btn-sm btn-outline-secondary" (click)="cancelEdit()">
+      <span class="material-icons-round fs-6">close</span>
+    </button>
+  </div>
+
+  <div class="alert alert-info py-2 d-flex align-items-center gap-2 mb-4">
+    <span class="material-icons-round fs-6">info</span>
+    <small>Editing is allowed only when status is <b>PLACED</b>.</small>
+  </div>
+
+  <form [formGroup]="editForm" (ngSubmit)="saveEdit()">
+    <div formArrayName="items" class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <label class="fw-medium small text-muted">Items</label>
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addItem('edit')">+ Add Item</button>
+      </div>
+
+      <div class="row g-2 mb-2" *ngFor="let grp of editItems.controls; let i = index" [formGroupName]="i">
+        <div class="col-md-8">
+          <select class="form-select" formControlName="productId">
+            <option [ngValue]="null">Select product</option>
+            <option *ngFor="let p of products" [ngValue]="p.productId">
+              {{ p.name }} ({{ p.sku }}) — ₹{{ p.unitPrice }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <input type="number" class="form-control" formControlName="qty" />
+        </div>
+        <div class="col-md-2">
+          <button type="button" class="btn btn-outline-danger w-100" (click)="removeItem(i, 'edit')"
+            [disabled]="editItems.length === 1">
+            <span class="material-icons-round fs-6">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div formGroupName="address" class="p-3 bg-light rounded-3 mb-3">
+      <div class="fw-semibold mb-3">Shipping Address</div>
+      <div class="row g-3">
+        <div class="col-md-6"><input class="form-control" formControlName="fullName" /></div>
+        <div class="col-md-6"><input class="form-control" formControlName="phone" /></div>
+        <div class="col-12"><input class="form-control" formControlName="line1" /></div>
+        <div class="col-12"><input class="form-control" formControlName="line2" /></div>
+        <div class="col-md-3"><input class="form-control" formControlName="city" /></div>
+        <div class="col-md-3"><input class="form-control" formControlName="state" /></div>
+        <div class="col-md-3"><input class="form-control" formControlName="pincode" /></div>
+        <div class="col-md-3"><input class="form-control" formControlName="country" /></div>
+      </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+      <button class="btn btn-primary shadow-sm" [disabled]="savingEdit || editForm.invalid">
+        {{ savingEdit ? 'Saving...' : 'Save Changes' }}
+      </button>
+      <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- Orders list -->
+<div class="card border-0 shadow-sm p-4 animate-fade-in">
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <span class="material-icons-round text-secondary">list_alt</span>
+    <h5 class="fw-bold mb-0">Order History</h5>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5 text-muted">
+    <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+    <div>Loading orders...</div>
+  </div>
+
+  <div *ngIf="!loading && orders.length === 0" class="text-center py-5 text-muted">
+    <span class="material-icons-round fs-1 text-light mb-2 d-block">inbox</span>
+    No orders found matching your criteria.
+  </div>
+
+  <div *ngFor="let o of orders" class="card border shadow-sm mb-3 hover-lift transition-all">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="fw-bold fs-5">#{{ o.orderId }}</span>
+            <span class="badge rounded-pill" [class.bg-warning-subtle]="o.status === 'PLACED'"
+              [class.text-warning-dark]="o.status === 'PLACED'" [class.bg-primary-subtle]="o.status === 'SHIPPED'"
+              [class.text-primary-dark]="o.status === 'SHIPPED'" [class.bg-success-subtle]="o.status === 'DELIVERED'"
+              [class.text-success-dark]="o.status === 'DELIVERED'" [class.bg-danger-subtle]="o.status === 'CANCELLED'"
+              [class.text-danger-dark]="o.status === 'CANCELLED'">
+              {{ o.status }}
+            </span>
+          </div>
+          <div class="text-muted small d-flex align-items-center gap-1">
+            <span class="material-icons-round fs-6" style="font-size: 14px !important;">schedule</span>
+            {{ o.createdAt | date:'medium' }}
+            <span *ngIf="ordersApi.isAdmin() && o.placedBy" class="ms-2 d-flex align-items-center gap-1 text-primary">
+              <span class="material-icons-round fs-6" style="font-size: 14px !important;">person</span>
+              {{ o.placedBy.username }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2">
+          <!-- Admin actions -->
+          <ng-container *ngIf="ordersApi.isAdmin()">
+            <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+              (click)="setStatus(o,'SHIPPED')" [disabled]="o.status!=='PLACED'">
+              <span class="material-icons-round fs-6">local_shipping</span> Ship
+            </button>
+            <button class="btn btn-sm btn-outline-success d-flex align-items-center gap-1"
+              (click)="setStatus(o,'DELIVERED')" [disabled]="o.status!=='SHIPPED'">
+              <span class="material-icons-round fs-6">check_circle</span> Deliver
+            </button>
+          </ng-container>
+
+          <!-- User actions -->
+          <ng-container *ngIf="!ordersApi.isAdmin()">
+            <button class="btn btn-sm btn-light text-primary" (click)="startEdit(o)" [disabled]="!canEdit(o)"
+              title="Edit">
+              <span class="material-icons-round fs-5">edit</span>
+            </button>
+            <button class="btn btn-sm btn-light text-danger" (click)="cancelOrder(o)" [disabled]="!canCancel(o)"
+              title="Cancel">
+              <span class="material-icons-round fs-5">cancel</span>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <!-- Address -->
+        <div class="col-md-5 border-end" *ngIf="o.shippingAddress">
+          <label class="small text-muted fw-bold text-uppercase mb-2">Shipping To</label>
+          <div class="d-flex gap-2">
+            <span class="material-icons-round fs-6 text-muted mt-1">place</span>
+            <div class="small text-dark">
+              <div class="fw-semibold">{{ o.shippingAddress.fullName }}</div>
+              <div class="text-muted">{{ o.shippingAddress.phone }}</div>
+              <div>{{ o.shippingAddress.line1 }}</div>
+              <div *ngIf="o.shippingAddress.line2">{{ o.shippingAddress.line2 }}</div>
+              <div>{{ o.shippingAddress.city }}, {{ o.shippingAddress.state }} {{ o.shippingAddress.pincode }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="col-md-7">
+          <label class="small text-muted fw-bold text-uppercase mb-2">Items</label>
+          <div class="table-responsive">
+            <table class="table table-sm table-borderless align-middle mb-0">
+              <tbody>
+                <tr *ngFor="let it of o.items">
+                  <td class="ps-0">
+                    <span class="fw-medium text-dark">{{ it.product.name }}</span>
+                    <span class="text-muted small ms-1">({{ it.product.sku }})</span>
+                  </td>
+                  <td class="text-end text-muted">x{{ it.qty }}</td>
+                  <td class="text-end fw-medium">₹{{ it.unitPriceAtPurchase }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!ordersApi.isAdmin() && (o.status==='SHIPPED' || o.status==='DELIVERED')"
+        class="alert alert-light border-0 bg-secondary bg-opacity-10 text-muted small py-2 mt-3 mb-0 d-flex align-items-center gap-2">
+        <span class="material-icons-round fs-6">lock</span>
+        Order cannot be modified after shipping.
+      </div>
+    </div>
+  </div>
+</div>

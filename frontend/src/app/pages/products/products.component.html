@@ -1,0 +1,188 @@
+<div class="d-flex align-items-center justify-content-between mb-4 animate-fade-in">
+  <div>
+    <h3 class="fw-bold mb-1">Products</h3>
+    <div class="text-muted small">Manage your inventory</div>
+  </div>
+  <button class="btn btn-white border shadow-sm d-flex align-items-center gap-2 hover-lift" (click)="refresh()">
+    <span class="material-icons-round fs-6">refresh</span>
+    <span>Refresh</span>
+  </button>
+</div>
+
+<div *ngIf="error" class="alert alert-danger py-2 d-flex align-items-center gap-2">
+  <span class="material-icons-round fs-5">error</span>
+  {{error}}
+</div>
+
+<div class="row g-4 animate-fade-in">
+  <!-- Product Form -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-lg p-4 glass sticky-top" style="top: 100px; z-index: 1;">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center gap-2">
+          <span class="material-icons-round text-primary">{{ editing ? 'edit' : 'add_circle' }}</span>
+          <h5 class="fw-bold mb-0">{{ editing ? 'Edit Product' : 'New Product' }}</h5>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" type="button"
+          (click)="startCreate()">
+          <span class="material-icons-round fs-6">clear</span>
+          Clear
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="mb-3">
+          <label class="form-label fw-medium small text-muted">SKU</label>
+          <input class="form-control" formControlName="sku" placeholder="E.g. PROD-001">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-medium small text-muted">Name *</label>
+          <input class="form-control" formControlName="name" placeholder="Product name">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-medium small text-muted">Description</label>
+          <textarea class="form-control" rows="2" formControlName="description"
+            placeholder="Optional description"></textarea>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-medium small text-muted">Price *</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0">₹</span>
+              <input type="number" class="form-control border-start-0" formControlName="unitPrice" placeholder="0.00">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-medium small text-muted">Stock *</label>
+            <input type="number" class="form-control" formControlName="stockQty" placeholder="0">
+          </div>
+        </div>
+
+        <div class="form-check form-switch mb-4">
+          <input class="form-check-input" type="checkbox" formControlName="isActive" id="active">
+          <label class="form-check-label fw-medium" for="active">Active Status</label>
+        </div>
+
+        <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm"
+          [disabled]="saving || form.invalid">
+          <span class="material-icons-round fs-5">{{ saving ? 'hourglass_empty' : 'save' }}</span>
+          {{ saving ? 'Saving...' : (editing ? 'Update Product' : 'Create Product') }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product List -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-2">
+          <h5 class="fw-bold mb-0">Products List</h5>
+          <span *ngIf="showLowStockOnly"
+            class="badge bg-danger bg-opacity-10 text-danger d-flex align-items-center gap-1">
+            <span class="material-icons-round fs-6">warning</span>
+            Low Stock Only
+            <span class="material-icons-round fs-6 cursor-pointer ms-1 hover-scale" (click)="clearLowStockFilter()"
+              title="Clear filter">close</span>
+          </span>
+        </div>
+        <div class="d-flex gap-3 align-items-center">
+          <div class="input-group input-group-sm" style="width: 200px;">
+            <span class="input-group-text bg-light border-end-0"><span
+                class="material-icons-round fs-6">search</span></span>
+            <input type="text" class="form-control border-start-0" placeholder="Search..."
+              (input)="search($any($event.target).value)">
+          </div>
+          <span class="badge bg-primary bg-opacity-10 text-primary">{{allProducts.length}} Total</span>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="text-center py-5 text-muted">
+        <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+        <div>Loading products...</div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table align-middle table-hover">
+          <thead class="bg-light">
+            <tr>
+              <th class="border-0 rounded-start ps-3 py-3 text-muted fw-medium small">DETAILS</th>
+              <th class="border-0 py-3 text-muted fw-medium small">PRICE</th>
+              <th class="border-0 py-3 text-muted fw-medium small">STOCK</th>
+              <th class="border-0 py-3 text-muted fw-medium small">STATUS</th>
+              <th class="border-0 rounded-end py-3 text-end pe-3 text-muted fw-medium small">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of paginatedProducts">
+              <td class="ps-3">
+                <div class="fw-bold text-dark">{{p.name}}</div>
+                <div class="text-muted small d-flex align-items-center gap-1">
+                  <span class="material-icons-round fs-6 text-muted" style="font-size: 12px !important;">tag</span>
+                  {{p.sku || 'No SKU'}}
+                </div>
+              </td>
+              <td class="fw-medium">₹{{p.unitPrice | number:'1.2-2'}}</td>
+              <td>
+                <span [class.text-danger]="p.stockQty < 10" [class.fw-bold]="p.stockQty < 10">{{p.stockQty}}</span>
+              </td>
+              <td>
+                <span class="badge rounded-pill border" [class.bg-success-subtle]="p.isActive"
+                  [class.text-success]="p.isActive" [class.border-success-subtle]="p.isActive"
+                  [class.bg-secondary-subtle]="!p.isActive" [class.text-secondary]="!p.isActive"
+                  [class.border-secondary-subtle]="!p.isActive">
+                  {{p.isActive ? 'Active' : 'Inactive'}}
+                </span>
+              </td>
+              <td class="text-end pe-3">
+                <button class="btn btn-sm btn-light text-primary me-2 hover-lift" (click)="startEdit(p)" title="Edit">
+                  <span class="material-icons-round fs-5">edit</span>
+                </button>
+                <button class="btn btn-sm btn-light text-danger hover-lift" (click)="remove(p)" title="Delete">
+                  <span class="material-icons-round fs-5">delete_outline</span>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="paginatedProducts.length === 0">
+              <td colspan="5" class="text-center py-5 text-muted">
+                <span class="material-icons-round fs-1 text-light mb-2 d-block">inventory_2</span>
+                No products found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="d-flex align-items-center justify-content-between border-top pt-3 mt-3"
+        *ngIf="!loading && allProducts.length > 0">
+        <div class="text-muted small">
+          Showing <span class="fw-bold text-dark">{{(currentPage - 1) * pageSize + 1}}</span> to <span
+            class="fw-bold text-dark">{{((currentPage - 1) * pageSize) + paginatedProducts.length}}</span> of <span
+            class="fw-bold text-dark">{{allProducts.length}}</span> entries
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-light text-dark btn-sm d-flex align-items-center gap-1" (click)="prevPage()"
+            [disabled]="currentPage === 1">
+            <span class="material-icons-round fs-5">chevron_left</span>
+            Prev
+          </button>
+
+          <div class="px-2 fw-medium text-muted small">
+            Page {{currentPage}} of {{totalPages}}
+          </div>
+
+          <button class="btn btn-outline-light text-dark btn-sm d-flex align-items-center gap-1" (click)="nextPage()"
+            [disabled]="currentPage === totalPages">
+            Next
+            <span class="material-icons-round fs-5">chevron_right</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

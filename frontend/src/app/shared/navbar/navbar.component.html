@@ -1,0 +1,65 @@
+<nav class="navbar navbar-expand-lg glass shadow-sm rounded-4 mb-4 sticky-top mt-3 mx-3">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-gradient" href="#">
+      <span class="material-icons-round text-primary">storefront</span>
+      OMS
+    </a>
+
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="material-icons-round text-dark">menu</span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
+
+        <li class="nav-item" *ngIf="auth.isAdmin()">
+          <a class="nav-link d-flex align-items-center gap-2 px-3 rounded-3" routerLink="/dashboard"
+            routerLinkActive="active bg-primary bg-opacity-10 text-primary fw-medium">
+            <span class="material-icons-round fs-6">dashboard</span>
+            Dashboard
+          </a>
+        </li>
+
+        <li class="nav-item" *ngIf="auth.isAdmin()">
+          <a class="nav-link d-flex align-items-center gap-2 px-3 rounded-3" routerLink="/products"
+            routerLinkActive="active bg-primary bg-opacity-10 text-primary fw-medium">
+            <span class="material-icons-round fs-6">inventory_2</span>
+            Products
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2 px-3 rounded-3" routerLink="/orders"
+            routerLinkActive="active bg-primary bg-opacity-10 text-primary fw-medium">
+            <span class="material-icons-round fs-6">shopping_bag</span>
+            Orders
+          </a>
+        </li>
+
+        <li class="nav-item" *ngIf="auth.isAdmin()">
+          <a class="nav-link d-flex align-items-center gap-2 px-3 rounded-3" routerLink="/admin/users"
+            routerLinkActive="active bg-primary bg-opacity-10 text-primary fw-medium">
+            <span class="material-icons-round fs-6">people</span>
+            Users
+          </a>
+        </li>
+
+      </ul>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2 text-muted small">
+          <div class="bg-secondary bg-opacity-10 rounded-circle p-1 d-flex">
+            <span class="material-icons-round fs-6">person</span>
+          </div>
+          <span class="fw-medium">{{auth.currentUsername()}}</span>
+        </div>
+        <button
+          class="btn btn-sm btn-outline-danger border-0 bg-danger bg-opacity-10 text-danger d-flex align-items-center gap-1 ps-2 pe-3"
+          (click)="logout()">
+          <span class="material-icons-round fs-6">logout</span>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

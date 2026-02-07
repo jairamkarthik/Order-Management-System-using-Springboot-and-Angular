@@ -1,0 +1,147 @@
+<div class="d-flex align-items-center justify-content-between mb-4 animate-fade-in">
+  <div>
+    <h3 class="fw-bold mb-1">Users</h3>
+    <div class="text-muted small">Admin: create and manage system users</div>
+  </div>
+</div>
+
+<div *ngIf="error" class="alert alert-danger py-2 d-flex align-items-center gap-2">
+  <span class="material-icons-round fs-5">error</span>
+  {{error}}
+</div>
+
+<div class="row g-4 animate-fade-in">
+  <!-- Create User Form -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm p-4 glass h-100">
+      <div class="d-flex align-items-center gap-2 mb-4">
+        <div class="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
+          <span class="material-icons-round fs-5">person_add</span>
+        </div>
+        <h5 class="fw-bold mb-0">Create User</h5>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="create()">
+        <div class="mb-3">
+          <label class="form-label fw-medium small text-muted">Username</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><span
+                class="material-icons-round fs-6">badge</span></span>
+            <input class="form-control border-start-0" formControlName="username" placeholder="e.g. john_doe">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-medium small text-muted">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><span
+                class="material-icons-round fs-6">vpn_key</span></span>
+            <input type="password" class="form-control border-start-0" formControlName="password"
+              placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-medium small text-muted">Role</label>
+          <select class="form-select" formControlName="role">
+            <option value="USER">Standard User</option>
+            <option value="ADMIN">Administrator</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary w-100 shadow-sm py-2" [disabled]="saving || form.invalid">
+          {{ saving ? 'Creating...' : 'Create User' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- User List -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm p-4 h-100">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div class="d-flex align-items-center gap-2">
+          <span class="material-icons-round text-secondary">group</span>
+          <h5 class="fw-bold mb-0">User Directory</h5>
+        </div>
+
+        <div class="d-flex gap-2">
+          <div class="input-group input-group-sm" style="width: 220px">
+            <span class="input-group-text bg-light border-end-0"><span
+                class="material-icons-round fs-6">search</span></span>
+            <input class="form-control border-start-0" [formControl]="searchCtrl" placeholder="Search username" />
+          </div>
+          <button class="btn btn-outline-dark btn-sm d-flex align-items-center gap-1" (click)="refresh()">
+            <span class="material-icons-round fs-6">search</span>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="text-center py-5 text-muted">
+        <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+        <div>Loading users...</div>
+      </div>
+
+      <div *ngIf="!loading && users.length === 0" class="text-center py-5 text-muted">
+        No users found.
+      </div>
+
+      <div *ngIf="!loading && users.length > 0" class="table-responsive">
+        <table class="table align-middle">
+          <thead class="text-muted small text-uppercase">
+            <tr>
+              <th class="fw-bold border-0">User Info</th>
+              <th class="fw-bold border-0" style="width: 180px">Role</th>
+              <th class="fw-bold border-0 text-end" style="width: 180px">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let u of users" class="border-bottom">
+              <td class="py-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="bg-secondary bg-opacity-10 p-2 rounded-circle text-secondary">
+                    <span class="material-icons-round fs-5">person</span>
+                  </div>
+                  <div>
+                    <div class="fw-semibold text-dark">{{u.username}}</div>
+                    <div class="small text-muted">ID: {{u.userId}}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td class="py-3">
+                <select class="form-select form-select-sm" [(ngModel)]="roleEdit[u.userId]"
+                  [ngModelOptions]="{standalone: true}" [disabled]="u.username==='admin'"
+                  [class.border-primary]="roleEdit[u.userId] === 'ADMIN'">
+                  <option value="USER">USER</option>
+                  <option value="ADMIN">ADMIN</option>
+                </select>
+              </td>
+
+              <td class="text-end py-3">
+                <div class="d-flex justify-content-end gap-2">
+                  <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" (click)="save(u)"
+                    [disabled]="u.username==='admin' || updating[u.userId]" title="Save Role">
+                    <span class="material-icons-round fs-6">save</span>
+                  </button>
+
+                  <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1" (click)="remove(u)"
+                    [disabled]="u.username==='admin'" title="Delete User">
+                    <span class="material-icons-round fs-6">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div
+        class="alert alert-light border-0 bg-secondary bg-opacity-10 text-muted small py-2 mt-auto mb-0 d-flex align-items-center gap-2">
+        <span class="material-icons-round fs-6">lock</span>
+        Default admin (<b>admin</b>) cannot be modified or deleted.
+      </div>
+    </div>
+  </div>
+</div>
