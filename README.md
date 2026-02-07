@@ -72,20 +72,20 @@ ng serve
 Update database and server configuration in:
 
 backend/src/main/resources/application.properties
-# Server
+### Server
 server.port=PORT_NUMBER <br>
 
-# Database
+### Database
 spring.datasource.url=DATABASE_URL <br>
 spring.datasource.username=USERNAME <br>
 spring.datasource.password=PASSWORD <br>
 
-# JPA / Hibernate
+### JPA / Hibernate
 spring.jpa.hibernate.ddl-auto=update <br>
 spring.jpa.show-sql=true <br>
 spring.jpa.properties.hibernate.format_sql=true <br>
 
-# JWT Configuration
+### JWT Configuration
 app.jwt.secret=ChangeThisToA_LongRandomSecretKey_AtLeast_32_Chars <br>
 app.jwt.exp-minutes=120 <br>
 
@@ -101,14 +101,14 @@ ADMIN: Full access
 USER: Limited access
 
 
-### Screnshots
-# Login page:
+# Screnshots
+### Login page:
 <img width="1919" height="1009" alt="image" src="https://github.com/user-attachments/assets/979dc66c-8c77-47a7-90d9-8f92285b9f14" />
 
-# Registration page:
+### Registration page:
 <img width="1918" height="1015" alt="image" src="https://github.com/user-attachments/assets/525fd206-19f6-4902-9c2c-f8814c30e969" />
 
-# Admin dashboard:
+### Admin dashboard:
 <img width="1919" height="1018" alt="image" src="https://github.com/user-attachments/assets/e2abb537-0a93-47dd-ab58-6e4cf348cb1c" />
 
 
