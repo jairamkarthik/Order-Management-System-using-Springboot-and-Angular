@@ -56,22 +56,22 @@ It uses **JWT-based authentication** to secure REST APIs and provides a responsi
 
 ### 🔧 Backend Setup
 
-git clone https://github.com/your-username/oms.git
-cd backend
-mvn clean install
-mvn spring-boot:run
+git clone https://github.com/your-username/oms.git <br>
+cd backend <br>
+mvn clean install <br>
+mvn spring-boot:run <br>
 
 ### 🎨 Frontend Setup
-cd frontend
-npm install
-ng serve
+cd frontend <br>
+npm install <br>
+ng serve <br>
 
 
 ### ⚙ Configuration
 
-Update database and server configuration in:
+Update database and server configuration in: <br>
 
-backend/src/main/resources/application.properties
+backend/src/main/resources/application.properties 
 ### Server
 server.port=PORT_NUMBER <br>
 
