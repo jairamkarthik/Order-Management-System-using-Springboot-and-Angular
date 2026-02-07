@@ -78,17 +78,17 @@ Update database credentials in:
 backend/src/main/resources/application.properties
 
 Add this to application.properties file:
-server.port=PORT_NUMBER
+-server.port=PORT_NUMBER
 
-spring.datasource.url=DATABASE_URL
-spring.datasource.username=USERNAME
-spring.datasource.password=PASSWORD
+-spring.datasource.url=DATABASE_URL
+-spring.datasource.username=USERNAME
+-spring.datasource.password=PASSWORD
 
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+-spring.jpa.hibernate.ddl-auto=update
+-spring.jpa.show-sql=true
+-spring.jpa.properties.hibernate.format_sql=true
 
 # JWT
-app.jwt.secret=ChangeThisToA_LongRandomSecretKey_AtLeast_32_Chars
-app.jwt.exp-minutes=120
+-app.jwt.secret=ChangeThisToA_LongRandomSecretKey_AtLeast_32_Chars
+-app.jwt.exp-minutes=120
 
