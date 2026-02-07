@@ -73,21 +73,21 @@ Update database and server configuration in:
 
 backend/src/main/resources/application.properties
 # Server
-server.port=PORT_NUMBER
+server.port=PORT_NUMBER <br>
 
 # Database
-spring.datasource.url=DATABASE_URL
-spring.datasource.username=USERNAME
-spring.datasource.password=PASSWORD
+spring.datasource.url=DATABASE_URL <br>
+spring.datasource.username=USERNAME <br>
+spring.datasource.password=PASSWORD <br>
 
 # JPA / Hibernate
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.hibernate.ddl-auto=update <br>
+spring.jpa.show-sql=true <br>
+spring.jpa.properties.hibernate.format_sql=true <br>
 
 # JWT Configuration
-app.jwt.secret=ChangeThisToA_LongRandomSecretKey_AtLeast_32_Chars
-app.jwt.exp-minutes=120
+app.jwt.secret=ChangeThisToA_LongRandomSecretKey_AtLeast_32_Chars <br>
+app.jwt.exp-minutes=120 <br>
 
 
 ### 🔐 Authentication & Authorization
