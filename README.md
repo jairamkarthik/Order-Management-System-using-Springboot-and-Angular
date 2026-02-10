@@ -72,7 +72,9 @@ ng serve <br>
 
 Update database and server configuration in: <br>
 
-backend/src/main/resources/application.properties 
+<em>backend/src/main/resources/application.properties</em> 
+
+
 server.port=PORT_NUMBER <br>
 spring.datasource.url=DATABASE_URL <br>
 spring.datasource.username=USERNAME <br>
