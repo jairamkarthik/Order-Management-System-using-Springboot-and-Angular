@@ -40,6 +40,7 @@ It uses **JWT-based authentication** to secure REST APIs and provides a responsi
 - Maven
 - Docker
 - Git & GitHub
+- Azure app services (For backend deployment)
 
 
 ---
