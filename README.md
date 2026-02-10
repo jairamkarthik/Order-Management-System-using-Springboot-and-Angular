@@ -73,20 +73,13 @@ ng serve <br>
 Update database and server configuration in: <br>
 
 backend/src/main/resources/application.properties 
-### Server
 server.port=PORT_NUMBER <br>
-
-### Database
 spring.datasource.url=DATABASE_URL <br>
 spring.datasource.username=USERNAME <br>
 spring.datasource.password=PASSWORD <br>
-
-### JPA / Hibernate
 spring.jpa.hibernate.ddl-auto=update <br>
 spring.jpa.show-sql=true <br>
 spring.jpa.properties.hibernate.format_sql=true <br>
-
-### JWT Configuration
 app.jwt.secret=ChangeThisToA_LongRandomSecretKey_AtLeast_32_Chars <br>
 app.jwt.exp-minutes=120 <br>
 
