@@ -1,6 +1,6 @@
-# 📦 Order Management System (Spring Boot + Angular)
+# 📦 Order Management System (Spring Boot)
 
-A full-stack **Order Management System (OMS)** built using **Spring Boot** for the backend and **Angular** for the frontend.
+A full-stack **Order Management System (OMS)** built using **Spring Boot** for the backend
 
 ---
 
@@ -31,11 +31,6 @@ It uses **JWT-based authentication** to secure REST APIs and provides a responsi
 - JPA / Hibernate
 - MySQL
 
-### Frontend
-- Angular
-- TypeScript
-- HTML, CSS
-
 ### Tools & DevOps
 - Maven
 - Docker
@@ -50,7 +45,6 @@ It uses **JWT-based authentication** to secure REST APIs and provides a responsi
 ### Prerequisites
 - Java 17+
 - Node.js
-- Angular CLI
 - MySQL
 
 ---
@@ -61,12 +55,6 @@ git clone https://github.com/your-username/oms.git <br>
 cd backend <br>
 mvn clean install <br>
 mvn spring-boot:run <br>
-
-### 🎨 Frontend Setup
-cd frontend <br>
-npm install <br>
-ng serve <br>
-
 
 ### ⚙ Configuration
 
